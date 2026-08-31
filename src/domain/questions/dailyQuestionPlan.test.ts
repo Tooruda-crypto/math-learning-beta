@@ -56,12 +56,16 @@ function maximumSkillCount(skillIds: QuestionSkillId[]): number {
 }
 
 describe('DailyQuestionPlan', () => {
-  it('学年別の既存スキル順序を定義する', () => {
+  it('学年別の既存スキル順序を保ち、新領域を末尾へ追加する', () => {
     expect(SKILL_SEQUENCE_BY_GRADE[1]).toEqual([
       'g1-add-within-10',
       'g1-sub-within-10',
       'g1-add-with-carry',
       'g1-sub-with-borrow',
+      'g1-number-concept',
+      'g1-time',
+      'g1-length',
+      'g1-money',
     ])
     expect(SKILL_SEQUENCE_BY_GRADE[2]).toEqual([
       'g2-add-two-one',
@@ -70,6 +74,10 @@ describe('DailyQuestionPlan', () => {
       'g2-sub-two-two',
       'g2-multiplication-2-5',
       'g2-multiplication-6-9',
+      'g2-number-concept',
+      'g2-time',
+      'g2-length',
+      'g2-money',
     ])
     expect(SKILL_SEQUENCE_BY_GRADE[3]).toEqual([
       'g3-add-three',
@@ -78,6 +86,10 @@ describe('DailyQuestionPlan', () => {
       'g3-division-exact',
       'g3-division-remainder',
       'g3-fraction-basic',
+      'g3-number-concept',
+      'g3-time',
+      'g3-length',
+      'g3-money',
     ])
   })
 

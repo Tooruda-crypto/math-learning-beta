@@ -39,6 +39,16 @@ export type StoredQuestionPresentationType =
   | 'quotient'
   | 'remainder'
   | 'fraction'
+  | 'clock'
+  | 'measurement'
+  | 'money'
+  | 'number-concept'
+
+export interface StoredQuestionVisual {
+  type: 'analog-clock'
+  hour: number
+  minute: number
+}
 
 export interface StoredQuestionChoice {
   id: string
@@ -57,6 +67,8 @@ export interface StoredLearningQuestion {
   difficulty: 1 | 2 | 3
   /** Priority 8以降。旧途中データでは未定義。 */
   presentationType?: StoredQuestionPresentationType
+  /** Priority 9以降。旧途中データでは未定義。 */
+  visual?: StoredQuestionVisual
 }
 
 export interface InProgressSession {

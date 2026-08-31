@@ -54,7 +54,7 @@ describe('ParentProgressPage', () => {
     expect(screen.getByText('0回')).toBeVisible()
     expect(screen.getByText('0問', { selector: '.parent-summary strong' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'あまりのある割り算' })).toBeVisible()
-    expect(screen.getAllByText('これから学習します')).toHaveLength(6)
+    expect(screen.getAllByText('これから学習します')).toHaveLength(10)
     expect(document.body.textContent).not.toMatch(/g[123]-/)
   })
 

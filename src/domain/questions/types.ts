@@ -16,6 +16,16 @@ export type QuestionPresentationType =
   | 'quotient'
   | 'remainder'
   | 'fraction'
+  | 'clock'
+  | 'measurement'
+  | 'money'
+  | 'number-concept'
+
+export interface QuestionVisual {
+  type: 'analog-clock'
+  hour: number
+  minute: number
+}
 
 export type QuestionProblemType =
   | 'g1-add-basic'
@@ -54,6 +64,22 @@ export type QuestionProblemType =
   | 'g3-division-remainder-only'
   | 'g3-division-remainder-word'
   | 'g3-fraction-basic'
+  | 'g1-add-word-varied'
+  | 'g1-sub-word-varied'
+  | 'g2-multiplication-word-varied'
+  | 'g3-division-word-varied'
+  | 'g1-number-concept'
+  | 'g2-number-concept'
+  | 'g3-number-concept'
+  | 'g1-time'
+  | 'g2-time'
+  | 'g3-time'
+  | 'g1-length'
+  | 'g2-length'
+  | 'g3-length'
+  | 'g1-money'
+  | 'g2-money'
+  | 'g3-money'
 
 export interface LearningQuestion {
   id: string
@@ -67,6 +93,7 @@ export interface LearningQuestion {
   /** Version 3/4で保存された途中問題には存在しないため、UIはcalculationを既定値にする。 */
   presentationType?: QuestionPresentationType
   problemType?: QuestionProblemType
+  visual?: QuestionVisual
 }
 
 export type QuestionSkillId =
@@ -86,5 +113,17 @@ export type QuestionSkillId =
   | 'g3-division-exact'
   | 'g3-division-remainder'
   | 'g3-fraction-basic'
+  | 'g1-number-concept'
+  | 'g1-time'
+  | 'g1-length'
+  | 'g1-money'
+  | 'g2-number-concept'
+  | 'g2-time'
+  | 'g2-length'
+  | 'g2-money'
+  | 'g3-number-concept'
+  | 'g3-time'
+  | 'g3-length'
+  | 'g3-money'
 
 export type RandomSource = () => number

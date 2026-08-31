@@ -4,6 +4,7 @@ import { createPersonalizedQuestionSession } from './domain/questions/dailyQuest
 import {
   generateQuestionForProblemType,
   getPriority8ProblemTypes,
+  getPriority9ProblemTypes,
 } from './domain/questions/generator'
 import type { LearningQuestion } from './domain/questions/types'
 import { HomePage } from './pages/HomePage'
@@ -47,7 +48,8 @@ export default function App({ repository: repositoryProp }: { repository?: AppRe
   const previewQuestion = useMemo(() => {
     if (!import.meta.env.DEV) return null
     const requested = new URLSearchParams(window.location.search).get('previewProblem')
-    const problemType = getPriority8ProblemTypes().find((type) => type === requested)
+    const problemType = [...getPriority8ProblemTypes(), ...getPriority9ProblemTypes()]
+      .find((type) => type === requested)
     return problemType ? generateQuestionForProblemType(problemType) : null
   }, [])
 

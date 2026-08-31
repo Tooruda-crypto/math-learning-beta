@@ -262,7 +262,11 @@ body::after {
 .question-card--comparison h1,
 .question-card--fraction h1,
 .question-card--quotient h1,
-.question-card--remainder h1 {
+.question-card--remainder h1,
+.question-card--clock h1,
+.question-card--measurement h1,
+.question-card--money h1,
+.question-card--number-concept h1 {
   max-width: 620px;
   margin-inline: auto;
   font-size: clamp(24px, 5vw, 39px);
@@ -272,7 +276,20 @@ body::after {
   overflow-wrap: anywhere;
 }
 .question-card--comparison .answer-choice,
-.question-card--word-problem .answer-choice { padding-inline: 10px; font-size: clamp(16px, 3vw, 23px); }
+.question-card--word-problem .answer-choice,
+.question-card--clock .answer-choice,
+.question-card--measurement .answer-choice,
+.question-card--money .answer-choice,
+.question-card--number-concept .answer-choice { padding-inline: 10px; font-size: clamp(16px, 3vw, 23px); }
+.analog-clock { display: block; width: clamp(168px, 34vw, 220px); height: auto; margin: -24px auto 34px; overflow: visible; filter: drop-shadow(0 0 18px rgba(58, 220, 255, .22)); }
+.analog-clock__glow { fill: rgba(30, 214, 255, .08); stroke: rgba(87, 226, 255, .25); stroke-width: 4; }
+.analog-clock__face { fill: rgba(8, 25, 68, .96); stroke: #67e4ff; stroke-width: 4; }
+.analog-clock__tick { stroke: #aabfff; stroke-width: 3; stroke-linecap: round; }
+.analog-clock text { fill: #fff9d6; font-size: 18px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; }
+.analog-clock__hand { stroke-linecap: round; }
+.analog-clock__hand--hour { stroke: #fff0a3; stroke-width: 8; }
+.analog-clock__hand--minute { stroke: #66e7ff; stroke-width: 5; }
+.analog-clock__pin { fill: #ffdc6b; stroke: #fff4bd; stroke-width: 2; }
 .answer-choice { border-color: rgba(110, 150, 238, .5); border-radius: 18px; color: #fbf8eb; background: linear-gradient(145deg, rgba(17,39,91,.92), rgba(21,31,85,.82)); box-shadow: inset 0 0 18px rgba(94,133,255,.05), 0 9px 20px rgba(0,5,31,.2); }
 .answer-choice:hover { border-color: rgba(114,225,255,.64); background: rgba(31, 61, 125, .84); }
 .answer-choice.is-selected { border-color: var(--cyan); color: #fff; background: linear-gradient(135deg, #1262b6, #067dba); box-shadow: 0 0 24px rgba(36,220,255,.44), inset 0 0 22px rgba(104,235,255,.16); }

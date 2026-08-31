@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { SpaceIcon, SpaceRobot } from '../components/SpaceIcon'
+import { AnalogClock } from '../components/AnalogClock'
 import type { LearningQuestion, QuestionAnswer } from '../domain/questions/types'
 import type { QuestionResult } from '../types/app'
 
@@ -159,6 +160,9 @@ export function QuestionPage({
         <span className="question-star question-star--two" aria-hidden="true">✧</span>
         <span className="question-label">もんだい</span>
         <h1 id="question-title">{question.prompt}</h1>
+        {question.visual?.type === 'analog-clock' && (
+          <AnalogClock hour={question.visual.hour} minute={question.visual.minute} />
+        )}
         <div className="answer-grid" role="group" aria-label="答えを選ぶ">
           {question.choices.map((choice) => {
             const isSelected = selectedAnswer === choice.value

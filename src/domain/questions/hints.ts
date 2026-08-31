@@ -34,5 +34,7 @@ export function createQuestionHint(
     }
     case 'g3-fraction-basic':
       return '同じ大きさにいくつ分けたか考えてみよう。'
+    default:
+      return '問題の数と単位を、順番にたしかめてみよう。'
   }
 }

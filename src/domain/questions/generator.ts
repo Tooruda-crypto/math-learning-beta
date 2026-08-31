@@ -1,5 +1,9 @@
 import type { Grade } from '../../types/app'
 import { createQuestionHint } from './hints'
+import {
+  createPriority9Draft,
+  PRIORITY_9_PROBLEM_TYPES,
+} from './priority9'
 import type {
   LearningQuestion,
   QuestionAnswer,
@@ -8,6 +12,7 @@ import type {
   QuestionProblemType,
   QuestionSkillId,
   RandomSource,
+  QuestionVisual,
 } from './types'
 
 interface WordItem { name: string; counter: string }
@@ -20,6 +25,7 @@ interface QuestionDraft {
   choiceValues?: QuestionAnswer[]
   choiceMin?: number
   choiceMax?: number
+  visual?: QuestionVisual
 }
 
 const WORD_ITEMS: readonly WordItem[] = [
@@ -42,22 +48,34 @@ const PRIORITY_8_PROBLEM_TYPES: readonly QuestionProblemType[] = [
 ]
 
 const SKILL_PROBLEM_TYPES: Record<QuestionSkillId, readonly QuestionProblemType[]> = {
-  'g1-add-within-10': ['g1-add-basic', 'g1-add-three', 'g1-add-missing', 'g1-compare', 'g1-add-word'],
-  'g1-sub-within-10': ['g1-sub-basic', 'g1-mixed-three', 'g1-sub-missing', 'g1-sub-word'],
+  'g1-add-within-10': ['g1-add-basic', 'g1-add-three', 'g1-add-missing', 'g1-compare', 'g1-add-word', 'g1-add-word-varied'],
+  'g1-sub-within-10': ['g1-sub-basic', 'g1-mixed-three', 'g1-sub-missing', 'g1-sub-word', 'g1-sub-word-varied'],
   'g1-add-with-carry': ['g1-add-carry', 'g1-add-carry-missing'],
   'g1-sub-with-borrow': ['g1-sub-borrow', 'g1-sub-borrow-missing'],
   'g2-add-two-one': ['g2-add-two-one'],
   'g2-sub-two-one': ['g2-sub-two-one'],
   'g2-add-two-two': ['g2-add-two-two', 'g2-add-two-two-missing', 'g2-add-two-two-word'],
   'g2-sub-two-two': ['g2-sub-two-two', 'g2-sub-two-two-missing', 'g2-sub-two-two-word'],
-  'g2-multiplication-2-5': ['g2-multiplication', 'g2-multiplication-missing', 'g2-multiplication-word'],
-  'g2-multiplication-6-9': ['g2-multiplication', 'g2-multiplication-missing', 'g2-multiplication-word'],
+  'g2-multiplication-2-5': ['g2-multiplication', 'g2-multiplication-missing', 'g2-multiplication-word', 'g2-multiplication-word-varied'],
+  'g2-multiplication-6-9': ['g2-multiplication', 'g2-multiplication-missing', 'g2-multiplication-word', 'g2-multiplication-word-varied'],
   'g3-add-three': ['g3-add-three'],
   'g3-sub-three': ['g3-sub-three'],
   'g3-multiply-two-one': ['g3-multiply-two-one', 'g3-multiplication-missing'],
-  'g3-division-exact': ['g3-division-exact', 'g3-division-missing', 'g3-division-word'],
-  'g3-division-remainder': ['g3-division-remainder', 'g3-division-quotient', 'g3-division-remainder-only', 'g3-division-remainder-word'],
+  'g3-division-exact': ['g3-division-exact', 'g3-division-missing', 'g3-division-word', 'g3-division-word-varied'],
+  'g3-division-remainder': ['g3-division-remainder', 'g3-division-quotient', 'g3-division-remainder-only', 'g3-division-remainder-word', 'g3-division-word-varied'],
   'g3-fraction-basic': ['g3-fraction-basic'],
+  'g1-number-concept': ['g1-number-concept'],
+  'g1-time': ['g1-time'],
+  'g1-length': ['g1-length'],
+  'g1-money': ['g1-money'],
+  'g2-number-concept': ['g2-number-concept'],
+  'g2-time': ['g2-time'],
+  'g2-length': ['g2-length'],
+  'g2-money': ['g2-money'],
+  'g3-number-concept': ['g3-number-concept'],
+  'g3-time': ['g3-time'],
+  'g3-length': ['g3-length'],
+  'g3-money': ['g3-money'],
 }
 
 const DEFAULT_SKILL_BY_PROBLEM_TYPE: Record<QuestionProblemType, QuestionSkillId> = {
@@ -79,12 +97,21 @@ const DEFAULT_SKILL_BY_PROBLEM_TYPE: Record<QuestionProblemType, QuestionSkillId
   'g3-division-word': 'g3-division-exact', 'g3-division-remainder': 'g3-division-remainder',
   'g3-division-quotient': 'g3-division-remainder', 'g3-division-remainder-only': 'g3-division-remainder',
   'g3-division-remainder-word': 'g3-division-remainder', 'g3-fraction-basic': 'g3-fraction-basic',
+  'g1-add-word-varied': 'g1-add-within-10', 'g1-sub-word-varied': 'g1-sub-within-10',
+  'g2-multiplication-word-varied': 'g2-multiplication-2-5',
+  'g3-division-word-varied': 'g3-division-exact',
+  'g1-number-concept': 'g1-number-concept', 'g1-time': 'g1-time',
+  'g1-length': 'g1-length', 'g1-money': 'g1-money',
+  'g2-number-concept': 'g2-number-concept', 'g2-time': 'g2-time',
+  'g2-length': 'g2-length', 'g2-money': 'g2-money',
+  'g3-number-concept': 'g3-number-concept', 'g3-time': 'g3-time',
+  'g3-length': 'g3-length', 'g3-money': 'g3-money',
 }
 
 const GRADE_SKILL_PLANS: Record<Grade, QuestionSkillId[]> = {
-  1: ['g1-add-within-10', 'g1-sub-within-10', 'g1-add-with-carry', 'g1-sub-with-borrow'],
-  2: ['g2-add-two-one', 'g2-sub-two-one', 'g2-add-two-two', 'g2-sub-two-two', 'g2-multiplication-2-5', 'g2-multiplication-6-9'],
-  3: ['g3-multiply-two-one', 'g3-division-exact', 'g3-division-remainder', 'g3-add-three', 'g3-sub-three', 'g3-fraction-basic'],
+  1: ['g1-add-within-10', 'g1-sub-within-10', 'g1-add-with-carry', 'g1-sub-with-borrow', 'g1-number-concept', 'g1-time', 'g1-length', 'g1-money'],
+  2: ['g2-add-two-one', 'g2-sub-two-one', 'g2-add-two-two', 'g2-sub-two-two', 'g2-multiplication-2-5', 'g2-multiplication-6-9', 'g2-number-concept', 'g2-time', 'g2-length', 'g2-money'],
+  3: ['g3-multiply-two-one', 'g3-division-exact', 'g3-division-remainder', 'g3-add-three', 'g3-sub-three', 'g3-fraction-basic', 'g3-number-concept', 'g3-time', 'g3-length', 'g3-money'],
 }
 
 function gradeForSkill(skillId: QuestionSkillId): Grade {
@@ -142,6 +169,8 @@ function remainderResultChoices(quotient: number, remainder: number, divisor: nu
 }
 
 function createDraft(problemType: QuestionProblemType, skillId: QuestionSkillId, random: RandomSource): QuestionDraft {
+  const priority9Draft = createPriority9Draft(problemType, skillId, random)
+  if (priority9Draft) return priority9Draft
   switch (problemType) {
     case 'g1-add-basic': { const a = randomInt(0, 10, random); const b = randomInt(0, 10 - a, random); return standardDraft(skillId, a, b, '+', a + b, 1) }
     case 'g1-add-three': { const a = randomInt(1, 4, random); const b = randomInt(1, Math.min(4, 9 - a), random); const c = randomInt(1, 10 - a - b, random); return { prompt: `${a} + ${b} + ${c} = ?`, answer: a + b + c, hint: `まず${a}と${b}をたしてみよう。`, difficulty: 2, presentationType: 'calculation' } }
@@ -189,9 +218,14 @@ function createDraft(problemType: QuestionProblemType, skillId: QuestionSkillId,
     }
     case 'g3-fraction-basic': { const denominator = randomInt(2, 6, random); const item = pick(FRACTION_ITEMS, random); const answer = `1/${denominator}`; return { prompt: `1つの${item}を\n${denominator}つに 同じ大きさで分けました。\n1つ分は？`, answer, hint: `${denominator}こに同じように分けたうちの、1こ分を考えよう。`, difficulty: 1, presentationType: 'fraction', choiceValues: [answer, ...[2, 3, 4, 5, 6].filter((value) => value !== denominator).slice(0, 3).map((value) => `1/${value}`)] } }
   }
+  throw new Error(`${problemType}の問題を生成できません。`)
 }
 
 function problemPresentation(problemType: QuestionProblemType): QuestionPresentationType {
+  if (problemType.endsWith('-time')) return 'clock'
+  if (problemType.endsWith('-length')) return 'measurement'
+  if (problemType.endsWith('-money')) return 'money'
+  if (problemType.endsWith('-number-concept')) return 'number-concept'
   if (problemType.includes('missing')) return 'fill-blank'
   if (problemType.includes('word')) return 'word-problem'
   if (problemType === 'g1-compare') return 'comparison'
@@ -204,7 +238,7 @@ function problemPresentation(problemType: QuestionProblemType): QuestionPresenta
 function createQuestion(grade: Grade, skillId: QuestionSkillId, problemType: QuestionProblemType, random: RandomSource): LearningQuestion {
   const draft = createDraft(problemType, skillId, random)
   const choices = draft.choiceValues ? valueChoices(draft.choiceValues, random) : numericChoices(Number(draft.answer), random, draft.choiceMin, draft.choiceMax)
-  return { id: `${problemType}-${draft.prompt.replace(/\s+/g, '')}`, grade, skillId, problemType, presentationType: draft.presentationType, prompt: draft.prompt, correctAnswer: draft.answer, choices, hint: draft.hint, difficulty: draft.difficulty }
+  return { id: `${problemType}-${draft.prompt.replace(/\s+/g, '')}`, grade, skillId, problemType, presentationType: draft.presentationType, prompt: draft.prompt, correctAnswer: draft.answer, choices, hint: draft.hint, difficulty: draft.difficulty, visual: draft.visual }
 }
 
 export function generateQuestionForProblemType(problemType: QuestionProblemType, random: RandomSource = Math.random): LearningQuestion {
@@ -256,3 +290,4 @@ export function generateQuestionsForSkillPlan(grade: Grade, skillIds: readonly Q
 export function getGradeSkillIds(grade: Grade): QuestionSkillId[] { return [...GRADE_SKILL_PLANS[grade]] }
 export function getProblemTypesForSkill(skillId: QuestionSkillId): readonly QuestionProblemType[] { return SKILL_PROBLEM_TYPES[skillId] }
 export function getPriority8ProblemTypes(): readonly QuestionProblemType[] { return PRIORITY_8_PROBLEM_TYPES }
+export function getPriority9ProblemTypes(): readonly QuestionProblemType[] { return PRIORITY_9_PROBLEM_TYPES }

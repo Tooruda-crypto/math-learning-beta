@@ -5,6 +5,7 @@ import {
   type SkillAssessment,
 } from '../skills/proficiency'
 import { generateQuestionsForSkillPlan } from './generator'
+import { PRIORITY_9_SKILL_IDS } from './priority9'
 import type {
   LearningQuestion,
   QuestionSkillId,
@@ -37,6 +38,7 @@ export interface PersonalizedQuestionSession {
 
 const WEAK_STATES = new Set(['FOCUS', 'REVIEW'])
 const CURRENT_STATES = new Set(['UNSEEN', 'LEARNING', 'STABLE'])
+const PRIORITY_9_SKILLS = new Set<QuestionSkillId>(PRIORITY_9_SKILL_IDS)
 
 function cycleSlots(
   kind: DailyQuestionSlotKind,
@@ -151,6 +153,16 @@ export function createDailyQuestionPlan(
         ? fallbackReviewSkills
         : [currentSkillId]
 
+  const legacyReviewSkills = sequence.filter(
+    (skillId) =>
+      !PRIORITY_9_SKILLS.has(skillId) &&
+      skillId !== currentSkillId &&
+      (skillProgress[skillId]?.attempts ?? 0) > 0,
+  )
+  const balancedReviewSkills = legacyReviewSkills.length > 0
+    ? legacyReviewSkills
+    : reviewSkills
+
   const slots = weaknessSkills.length > 0
     ? [
         ...cycleSlots('current', 4, [currentSkillId]),
@@ -158,7 +170,13 @@ export function createDailyQuestionPlan(
         ...cycleSlots('review', 2, reviewSkills),
         ...cycleSlots('challenge', 1, [challengeSkillId]),
       ]
-    : [
+    : PRIORITY_9_SKILLS.has(currentSkillId)
+      ? [
+          ...cycleSlots('current', 4, [currentSkillId]),
+          ...cycleSlots('review', 5, balancedReviewSkills),
+          ...cycleSlots('challenge', 1, [challengeSkillId]),
+        ]
+      : [
         ...cycleSlots('current', 6, [currentSkillId]),
         ...cycleSlots('review', 3, reviewSkills),
         ...cycleSlots('challenge', 1, [challengeSkillId]),
